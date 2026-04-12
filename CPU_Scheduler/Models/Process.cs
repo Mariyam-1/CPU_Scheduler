@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Windows.Media;
 
 namespace CPU_Scheduler.Models
 {
@@ -13,6 +14,7 @@ namespace CPU_Scheduler.Models
         public int BurstTime { get; set; }
         public int Priority { get; set; }
         public int TimeQuantum { get; set; }
+        public Brush ProcessColor { get; set; }
 
         public int RemainingBurstTime
         {
@@ -51,6 +53,11 @@ namespace CPU_Scheduler.Models
             Priority = priority;
             TimeQuantum = timeQuantum;
             RemainingBurstTime = burstTime;
+
+            Random rnd = new Random();
+            byte[] rgb = new byte[3];
+            rnd.NextBytes(rgb);
+            ProcessColor = new SolidColorBrush(Color.FromRgb(rgb[0], rgb[1], rgb[2]));
         }
 
         public void Reset()
