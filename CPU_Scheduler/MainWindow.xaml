@@ -6,7 +6,89 @@
         xmlns:local="clr-namespace:CPU_Scheduler"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
-    <Grid>
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="120"/>
+        </Grid.RowDefinitions>
 
+        <Border Grid.Row="0" Background="White" CornerRadius="8" Padding="15" Margin="0,0,0,15">
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="10" ShadowDepth="2" Opacity="0.1"/>
+            </Border.Effect>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <WrapPanel VerticalAlignment="Center">
+                    <StackPanel Margin="0,0,15,0">
+                        <TextBlock Text="Process ID" FontSize="11" Foreground="Gray" Margin="0,0,0,3"/>
+                        <TextBox x:Name="InputPID" Width="60" Padding="5,2"/>
+                    </StackPanel>
+
+                    <StackPanel Margin="0,0,15,0">
+                        <TextBlock Text="Burst Time" FontSize="11" Foreground="Gray" Margin="0,0,0,3"/>
+                        <TextBox x:Name="InputBurst" Width="60" Padding="5,2"/>
+                    </StackPanel>
+
+                    <StackPanel Margin="0,0,15,0">
+                        <TextBlock Text="Priority" FontSize="11" Foreground="Gray" Margin="0,0,0,3"/>
+                        <TextBox x:Name="InputPriority" Width="40" Padding="5,2"/>
+                    </StackPanel>
+
+                    <StackPanel Margin="0,0,15,0">
+                        <TextBlock Text="Algorithm" FontSize="11" Foreground="Gray" Margin="0,0,0,3"/>
+                        <ComboBox x:Name="AlgoSelector" Width="140" SelectedIndex="0" Padding="5,2" SelectionChanged="AlgoSelector_SelectionChanged_1">
+                            <ComboBoxItem Content="FCFS"/>
+                            <ComboBoxItem Content="SJF (Non-Preemptive)"/>
+                            <ComboBoxItem Content="SJF (Preemptive)"/>
+                            <ComboBoxItem Content="Priority"/>
+                        </ComboBox>
+                    </StackPanel>
+
+                    <Button Content="Add Process" Click="AddProcess_Click" 
+                            Background="#0078D7" Foreground="White" BorderThickness="0" 
+                            Padding="15,5" Margin="0,12,0,0" VerticalAlignment="Bottom"/>
+                </WrapPanel>
+
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Bottom">
+                    <TextBlock x:Name="TimeLabel" Text="00:00" FontSize="24" FontWeight="Light" 
+                               VerticalAlignment="Center" Margin="0,0,20,0"/>
+                    <Button x:Name="Startmaya" Content="RUN SIMULATION" Click="StartBtn_Click" 
+                            Background="#28A745" Foreground="White" FontWeight="Bold" 
+                            Padding="20,10" BorderThickness="0" Cursor="Hand"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <Border Grid.Row="1" Background="White" CornerRadius="8">
+            <DataGrid x:Name="ProcessGrid" AutoGenerateColumns="False" IsReadOnly="True" 
+                      BorderThickness="0" GridLinesVisibility="Horizontal" Background="Transparent">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="PID" Binding="{Binding ProcessID}" Width="*"/>
+                    <DataGridTextColumn Header="Arriving Time" Binding="{Binding ArrivalTime}" Width="*"/>
+                    <DataGridTextColumn Header="Initial Burst" Binding="{Binding BurstTime}" Width="*"/>
+                    <DataGridTextColumn Header="Remaining" Binding="{Binding RemainingBurstTime}" Width="*"/>
+                    <DataGridTextColumn Header="Priority" Binding="{Binding Priority}" Width="*"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Border>
+
+        <TextBlock Text="VISUAL TIMELINE" 
+           Grid.Row="2" 
+           Margin="0,20,0,8" 
+           FontWeight="SemiBold" 
+           Foreground="#555" 
+           FontSize="12" />
+
+        <Border Grid.Row="3" Background="#1E1E1E" CornerRadius="8" ClipToBounds="True">
+            <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+                <StackPanel x:Name="GanttContainer" Orientation="Horizontal" Margin="10"/>
+            </ScrollViewer>
+        </Border>
     </Grid>
 </Window>

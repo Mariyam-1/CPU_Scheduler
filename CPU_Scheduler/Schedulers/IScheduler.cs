@@ -2,7 +2,7 @@
 
 namespace CPU_Scheduler.Schedulers
 {
-    public interface IScheduler
+    public interface IScheduler 
     {
         string SchedulerName { get; }
         void AddProcess(Process process);
