@@ -58,14 +58,18 @@ namespace CPU_Scheduler
             _currentTime = 0;
             _result.Reset();
             GanttContainer.Children.Clear();
-    
+
             selectedAlgo = (AlgoSelector.SelectedItem as ComboBoxItem).Content.ToString();
+            int.TryParse(InputQuantum.Text, out int quantum);
+            if (quantum <= 0) quantum = 2;
+
             _currentScheduler = selectedAlgo switch
             {
                 "FCFS" => new FCFSScheduler(),
                 "SJF (Non-Preemptive)" => new SJFScheduler(false),
                 "SJF (Preemptive)" => new SJFScheduler(true),
-                "Priority" => new PriorityScheduler()
+                "Priority" => new PriorityScheduler(),
+                "Round Robin" => new RoundRobinScheduler(quantum)
             };
 
             foreach (var p in Processes)
@@ -85,7 +89,7 @@ namespace CPU_Scheduler
             if (current != null)
             {
                 _result.AppendGanttTick(current.ProcessID, _currentTime);
-        
+
                 if (current.StartTime == -1) current.StartTime = _currentTime;
                 current.RemainingBurstTime--;
                 _currentTime++;
