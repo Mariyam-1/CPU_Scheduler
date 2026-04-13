@@ -1,4 +1,4 @@
-﻿<Window x:Class="CPU_Scheduler.MainWindow"
+<Window x:Class="CPU_Scheduler.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -41,12 +41,18 @@
                     </StackPanel>
 
                     <StackPanel Margin="0,0,15,0">
+                        <TextBlock Text="Quantum" FontSize="11" Foreground="Gray" Margin="0,0,0,3"/>
+                        <TextBox x:Name="InputQuantum" Width="40" Padding="5,2" Text="2"/>
+                    </StackPanel>
+
+                    <StackPanel Margin="0,0,15,0">
                         <TextBlock Text="Algorithm" FontSize="11" Foreground="Gray" Margin="0,0,0,3"/>
                         <ComboBox x:Name="AlgoSelector" Width="140" SelectedIndex="0" Padding="5,2" SelectionChanged="AlgoSelector_SelectionChanged_1">
                             <ComboBoxItem Content="FCFS"/>
                             <ComboBoxItem Content="SJF (Non-Preemptive)"/>
                             <ComboBoxItem Content="SJF (Preemptive)"/>
                             <ComboBoxItem Content="Priority"/>
+                            <ComboBoxItem Content="Round Robin"/>
                         </ComboBox>
                     </StackPanel>
 
