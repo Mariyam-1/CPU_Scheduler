@@ -68,7 +68,8 @@ namespace CPU_Scheduler
                 "FCFS" => new FCFSScheduler(),
                 "SJF (Non-Preemptive)" => new SJFScheduler(false),
                 "SJF (Preemptive)" => new SJFScheduler(true),
-                "Priority" => new PriorityScheduler(),
+                "Priority (Preemptive)" => new PriorityScheduler(true),
+                "Priority (Non-Preemptive)" => new PriorityScheduler(false),
                 "Round Robin" => new RoundRobinScheduler(quantum)
             };
 

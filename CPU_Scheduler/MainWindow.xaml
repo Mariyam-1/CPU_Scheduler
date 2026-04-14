@@ -51,7 +51,8 @@
                             <ComboBoxItem Content="FCFS"/>
                             <ComboBoxItem Content="SJF (Non-Preemptive)"/>
                             <ComboBoxItem Content="SJF (Preemptive)"/>
-                            <ComboBoxItem Content="Priority"/>
+                            <ComboBoxItem Content="Priority (Preemptive)"/>
+                            <ComboBoxItem Content="Priority (Non-Preemptive)"/>
                             <ComboBoxItem Content="Round Robin"/>
                         </ComboBox>
                     </StackPanel>
