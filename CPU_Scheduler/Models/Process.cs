@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Media;
 
@@ -41,8 +41,8 @@ namespace CPU_Scheduler.Models
         public int StartTime { get; set; } = -1;
         public int FinishTime { get; set; }
 
-        public int TurnaroundTime => FinishTime - ArrivalTime;
-        public int WaitingTime => TurnaroundTime - BurstTime;
+        public int TurnaroundTime => State == "Finished" ? FinishTime - ArrivalTime : 0;
+        public int WaitingTime => State == "Finished" ? TurnaroundTime - BurstTime : 0;
 
         public Process(string processID, int arrivalTime, int burstTime,
                        int priority = 0, int timeQuantum = 0)
