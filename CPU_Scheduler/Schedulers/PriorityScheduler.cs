@@ -1,19 +1,48 @@
-﻿using CPU_Scheduler.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CPU_Scheduler.Models;
 
 namespace CPU_Scheduler.Schedulers
 {
-    public class PriorityScheduler : BaseScheduler
+    internal class PriorityScheduler : BaseScheduler
     {
-        public override string SchedulerName => "Priority Scheduling";
+        private readonly bool _isPreemptive;
+
+        public PriorityScheduler(bool isPreemptive = false)
+        {
+            _isPreemptive = isPreemptive;
+        }
+
+        public override string SchedulerName =>
+            _isPreemptive ? "Priority (Preemptive)" : "Priority (Non-Preemptive)";
 
         public override Process? GetNextProcess(int currentTime)
         {
-            throw new NotImplementedException();
+            // Non-preemptive: skip the queue scan entirely if current process is still running
+            if (!_isPreemptive && CurrentProcess?.RemainingBurstTime > 0 && CurrentProcess!= null)
+                return CurrentProcess;
+
+            //// Otherwise (Preemptive or CPU is idle), find the highest priority process
+            var next = ReadyQueue
+                .Where(p => p.ArrivalTime <= currentTime && p.RemainingBurstTime > 0)
+                .OrderBy(p => p.Priority)
+                .ThenBy(p => p.ArrivalTime)
+                .FirstOrDefault();
+
+            if (next is null)
+                return null;
+
+            CurrentProcess = next;
+            return CurrentProcess;
+        }
+
+        public override void Reset()
+        {
+            base.Reset();
+            CurrentProcess = null;
         }
     }
 }
