@@ -17,7 +17,7 @@ namespace CPU_Scheduler.Schedulers
             if (CurrentProcess != null && CurrentProcess.RemainingBurstTime > 0)
                 return CurrentProcess;
             CurrentProcess = ReadyQueue.Where(p => p.ArrivalTime <= currentTime && p.RemainingBurstTime > 0).
-                OrderBy(p => p.ArrivalTime).ThenBy(p => p.BurstTime).FirstOrDefault();
+                OrderBy(p => p.ArrivalTime).FirstOrDefault();
             return CurrentProcess;
         }
     }
