@@ -68,7 +68,8 @@ namespace CPU_Scheduler
                 "FCFS" => new FCFSScheduler(),
                 "SJF (Non-Preemptive)" => new SJFScheduler(false),
                 "SJF (Preemptive)" => new SJFScheduler(true),
-                "Priority" => new PriorityScheduler(),
+                "Priority (Preemptive)" => new PriorityScheduler(true),
+                "Priority (Non-Preemptive)" => new PriorityScheduler(false),
                 "Round Robin" => new RoundRobinScheduler(quantum)
             };
 
@@ -167,7 +168,7 @@ namespace CPU_Scheduler
                 QuantumPanel.Visibility = Visibility.Visible;
                 PriorityPanel.Visibility = Visibility.Collapsed;
             }
-            else if (selected == "Priority")
+            else if (selected == "Priority (Preemptive)" || selected == "Priority (Non-Preemptive)")
             {
                 QuantumPanel.Visibility = Visibility.Collapsed;
                 PriorityPanel.Visibility = Visibility.Visible;
