@@ -262,7 +262,7 @@
                 <DropShadowEffect BlurRadius="25" ShadowDepth="10" Opacity="0.15" Color="Black" Direction="270"/>
             </Border.Effect>
             <!-- A subtle inner glow could be achieved with another border, but keeping simple here -->
-            <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled" Padding="20">
+            <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled" Padding="10">
                 <StackPanel x:Name="GanttContainer" Orientation="Horizontal" VerticalAlignment="Center"/>
             </ScrollViewer>
         </Border>

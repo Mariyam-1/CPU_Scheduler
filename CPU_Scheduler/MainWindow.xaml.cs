@@ -66,8 +66,8 @@ namespace CPU_Scheduler
             _currentScheduler = selectedAlgo switch
             {
                 "FCFS" => new FCFSScheduler(),
-                "SJF (Non-Preemptive)" => new SJFScheduler(false),
                 "SJF (Preemptive)" => new SJFScheduler(true),
+                "SJF (Non-Preemptive)" => new SJFScheduler(false),
                 "Priority (Preemptive)" => new PriorityScheduler(true),
                 "Priority (Non-Preemptive)" => new PriorityScheduler(false),
                 "Round Robin" => new RoundRobinScheduler(quantum)
@@ -126,7 +126,7 @@ namespace CPU_Scheduler
 
                 var block = new Border
                 {
-                    Width = entry.Duration * 80,
+                    Width = entry.Duration * 40,
                     Height = 60,
                     Background = processBrush,
                     BorderBrush = Brushes.White,
@@ -150,11 +150,6 @@ namespace CPU_Scheduler
             AvgWaitText.Text = $"Avg Wait: {_result.AverageWaitingTime:0.0}s";
             AvgTurnText.Text = $"Avg Turnaround: {_result.AverageTurnaroundTime:0.0}s";
             ProcessGrid.Items.Refresh();
-        }
-
-        private void AlgoSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-
         }
 
         private void AlgoSelector_SelectionChanged_1(object sender, SelectionChangedEventArgs e)
