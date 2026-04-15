@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
@@ -126,22 +126,58 @@ namespace CPU_Scheduler
 
                 var block = new Border
                 {
-                    Width = entry.Duration * 40,
+                    Width = entry.Duration * 80,
+                    Height = 60,
                     Background = processBrush,
                     BorderBrush = Brushes.White,
-                    BorderThickness = new Thickness(1),
+                    BorderThickness = new Thickness(2),
+                    CornerRadius = new CornerRadius(4),
+                    Margin = new Thickness(0, 0, 4, 0),
                     Child = new TextBlock
                     {
                         Text = entry.ProcessID,
                         Foreground = Brushes.White,
                         FontWeight = FontWeights.Bold,
+                        FontSize = 18,
                         HorizontalAlignment = HorizontalAlignment.Center,
                         VerticalAlignment = VerticalAlignment.Center
                     }
                 };
                 GanttContainer.Children.Add(block);
             }
+
+            // Update averages and refresh properties for the DataGrid (Wait/Turnaround times)
+            AvgWaitText.Text = $"Avg Wait: {_result.AverageWaitingTime:0.0}s";
+            AvgTurnText.Text = $"Avg Turnaround: {_result.AverageTurnaroundTime:0.0}s";
+            ProcessGrid.Items.Refresh();
         }
 
+        private void AlgoSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+        }
+
+        private void AlgoSelector_SelectionChanged_1(object sender, SelectionChangedEventArgs e)
+        {
+            if (AlgoSelector == null || PriorityPanel == null || QuantumPanel == null) return;
+            
+            var selected = (AlgoSelector.SelectedItem as ComboBoxItem)?.Content?.ToString();
+            
+            if (selected == "Round Robin")
+            {
+                QuantumPanel.Visibility = Visibility.Visible;
+                PriorityPanel.Visibility = Visibility.Collapsed;
+            }
+            else if (selected == "Priority (Preemptive)" || selected == "Priority (Non-Preemptive)")
+            {
+                QuantumPanel.Visibility = Visibility.Collapsed;
+                PriorityPanel.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                QuantumPanel.Visibility = Visibility.Collapsed;
+                PriorityPanel.Visibility = Visibility.Collapsed;
+            }
+        }
     }
 }
