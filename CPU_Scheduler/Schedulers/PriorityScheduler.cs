@@ -7,7 +7,7 @@ using CPU_Scheduler.Models;
 
 namespace CPU_Scheduler.Schedulers
 {
-    public class PriorityScheduler : BaseScheduler
+    internal class PriorityScheduler : BaseScheduler
     {
         private readonly bool _isPreemptive;
 
