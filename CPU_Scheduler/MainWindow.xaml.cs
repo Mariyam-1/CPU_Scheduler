@@ -138,14 +138,5 @@ namespace CPU_Scheduler
             }
         }
 
-        private void AlgoSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-
-        }
-
-        private void AlgoSelector_SelectionChanged_1(object sender, SelectionChangedEventArgs e)
-        {
-
-        }
     }
 }
