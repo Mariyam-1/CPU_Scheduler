@@ -22,9 +22,10 @@ namespace CPU_Scheduler.Schedulers
         public override Process? GetNextProcess(int currentTime)
         {
             // Non-preemptive: skip the queue scan entirely if current process is still running
-            if (!_isPreemptive && CurrentProcess?.RemainingBurstTime > 0)
+            if (!_isPreemptive && CurrentProcess?.RemainingBurstTime > 0 && CurrentProcess!= null)
                 return CurrentProcess;
 
+            //// Otherwise (Preemptive or CPU is idle), find the highest priority process
             var next = ReadyQueue
                 .Where(p => p.ArrivalTime <= currentTime && p.RemainingBurstTime > 0)
                 .OrderBy(p => p.Priority)
