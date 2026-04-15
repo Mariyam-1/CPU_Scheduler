@@ -127,8 +127,21 @@
 
                 <WrapPanel VerticalAlignment="Center">
                     <StackPanel Margin="0,0,25,15">
+                        <TextBlock Text="MODE" Style="{StaticResource InputLabel}"/>
+                        <ComboBox x:Name="ModeSelector" Width="100" SelectedIndex="0" SelectionChanged="ModeSelector_SelectionChanged" Height="36">
+                            <ComboBoxItem Content="Dynamic"/>
+                            <ComboBoxItem Content="Static"/>
+                        </ComboBox>
+                    </StackPanel>
+
+                    <StackPanel x:Name="ArrivalPanel" Margin="0,0,25,15" Visibility="Collapsed">
+                        <TextBlock Text="ARRIVAL" Style="{StaticResource InputLabel}"/>
+                        <TextBox x:Name="InputArrival" Width="70" Text="0"/>
+                    </StackPanel>
+
+                    <StackPanel Margin="0,0,25,15">
                         <TextBlock Text="PROCESS ID" Style="{StaticResource InputLabel}"/>
-                        <TextBox x:Name="InputPID" Width="110"/>
+                        <TextBox x:Name="InputPID" Width="90"/>
                     </StackPanel>
 
                     <StackPanel Margin="0,0,25,15">
@@ -171,6 +184,9 @@
                     </Border>
                     <Button x:Name="Startmaya" Content="▶ RUN ALGORITHM" Click="StartBtn_Click" 
                             Style="{StaticResource ModernButtonGreen}" Height="45" FontSize="15" Padding="25,0"/>
+                    <Button x:Name="ResetBtn" Content="⏹ RESET" Click="ResetBtn_Click" 
+                            Style="{StaticResource ModernButton}" Background="#EF4444" Height="45" FontSize="15" Padding="25,0" Margin="10,0,0,0"
+                            Visibility="Collapsed"/>
                 </StackPanel>
             </Grid>
         </Border>

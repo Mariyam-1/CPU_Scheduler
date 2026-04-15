@@ -16,6 +16,9 @@ namespace CPU_Scheduler
         private ScheduleResult _result = new();
         private DispatcherTimer _timer;
         private int _currentTime = 0;
+        private bool _isSimulationActive = false;
+        private bool _hasStarted = false;
+        private string _currentMode = "Dynamic";
 
         // This would be initialized based on your ComboBox selection
         public string selectedAlgo;
@@ -34,13 +37,32 @@ namespace CPU_Scheduler
 
         private void AddProcess_Click(object sender, RoutedEventArgs e)
         {
+            if (_hasStarted && _currentMode == "Static")
+            {
+                MessageBox.Show("Cannot add processes while a Static simulation is running.", "Warning");
+                return;
+            }
+
+            if (_isSimulationActive && _currentMode == "Dynamic")
+            {
+                MessageBox.Show("Please Pause the simulation before adding a dynamic process.", "Warning");
+                return;
+            }
+
             if (int.TryParse(InputBurst.Text, out int burst))
             {
                 int.TryParse(InputPriority.Text, out int priority);
 
-                var p = new Process(InputPID.Text, _currentTime, burst, priority);
+                int arrival = _currentTime; 
+                if (_currentMode == "Static")
+                {
+                    if (!int.TryParse(InputArrival.Text, out arrival)) arrival = 0;
+                }
+
+                var p = new Process(InputPID.Text, arrival, burst, priority);
                 Processes.Add(p);
-                if (_currentScheduler != null)
+                
+                if (_hasStarted && _currentScheduler != null)
                 {
                     _currentScheduler.AddProcess(p);
                 }
@@ -55,32 +77,50 @@ namespace CPU_Scheduler
         {
             if (Processes.Count == 0) return;
 
-            _currentTime = 0;
-            _result.Reset();
-            GanttContainer.Children.Clear();
-
-            selectedAlgo = (AlgoSelector.SelectedItem as ComboBoxItem).Content.ToString();
-            int.TryParse(InputQuantum.Text, out int quantum);
-            if (quantum <= 0) quantum = 2;
-
-            _currentScheduler = selectedAlgo switch
+            if (_isSimulationActive)
             {
-                "FCFS" => new FCFSScheduler(),
-                "SJF (Non-Preemptive)" => new SJFScheduler(false),
-                "SJF (Preemptive)" => new SJFScheduler(true),
-                "Priority (Preemptive)" => new PriorityScheduler(true),
-                "Priority (Non-Preemptive)" => new PriorityScheduler(false),
-                "Round Robin" => new RoundRobinScheduler(quantum)
-            };
-
-            foreach (var p in Processes)
-            {
-                p.Reset();
-                _currentScheduler.AddProcess(p);
+                _timer.Stop();
+                _isSimulationActive = false;
+                Startmaya.Content = "▶ RESUME";
+                Startmaya.Background = Brushes.Orange;
+                return;
             }
 
+            if (!_hasStarted)
+            {
+                _currentTime = 0;
+                _result.Reset();
+                GanttContainer.Children.Clear();
+
+                selectedAlgo = (AlgoSelector.SelectedItem as ComboBoxItem).Content.ToString();
+                int.TryParse(InputQuantum.Text, out int quantum);
+                if (quantum <= 0) quantum = 2;
+
+                _currentScheduler = selectedAlgo switch
+                {
+                    "FCFS" => new FCFSScheduler(),
+                    "SJF (Non-Preemptive)" => new SJFScheduler(false),
+                    "SJF (Preemptive)" => new SJFScheduler(true),
+                    "Priority (Preemptive)" => new PriorityScheduler(true),
+                    "Priority (Non-Preemptive)" => new PriorityScheduler(false),
+                    "Round Robin" => new RoundRobinScheduler(quantum),
+                    _ => new FCFSScheduler()
+                };
+
+                foreach (var p in Processes)
+                {
+                    p.Reset();
+                    _currentScheduler.AddProcess(p);
+                }
+                
+                _hasStarted = true;
+                ResetBtn.Visibility = Visibility.Visible;
+            }
 
             _timer.Start();
+            _isSimulationActive = true;
+            Startmaya.Content = "⏸ PAUSE";
+            Startmaya.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#EF4444")); // Red for pause
         }
 
         private void Timer_Tick(object sender, EventArgs e)
@@ -150,6 +190,35 @@ namespace CPU_Scheduler
             AvgWaitText.Text = $"Avg Wait: {_result.AverageWaitingTime:0.0}s";
             AvgTurnText.Text = $"Avg Turnaround: {_result.AverageTurnaroundTime:0.0}s";
             ProcessGrid.Items.Refresh();
+        }
+
+        private void ResetBtn_Click(object sender, RoutedEventArgs e)
+        {
+            _timer.Stop();
+            _isSimulationActive = false;
+            _hasStarted = false;
+            _currentTime = 0;
+            TimeLabel.Text = $"Time: 0s";
+            _result.Reset();
+            GanttContainer.Children.Clear();
+            foreach(var p in Processes) p.Reset();
+            
+            Startmaya.Content = "▶ RUN ALGORITHM";
+            Startmaya.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#10B981")); // Green
+            ResetBtn.Visibility = Visibility.Collapsed;
+            ProcessGrid.Items.Refresh();
+        }
+
+        private void ModeSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (ArrivalPanel == null) return;
+            var selected = (ModeSelector.SelectedItem as ComboBoxItem)?.Content?.ToString();
+            _currentMode = selected ?? "Dynamic";
+
+            if (_currentMode == "Static")
+                ArrivalPanel.Visibility = Visibility.Visible;
+            else
+                ArrivalPanel.Visibility = Visibility.Collapsed;
         }
 
         private void AlgoSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)
