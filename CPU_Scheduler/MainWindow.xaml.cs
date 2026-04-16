@@ -16,8 +16,13 @@ namespace CPU_Scheduler
         private ScheduleResult _result = new();
         private DispatcherTimer _timer;
         private int _currentTime = 0;
+        private bool _isSimulationActive = false;
+        private bool _hasStarted = false;
 
-        // This would be initialized based on your ComboBox selection
+        private bool Finished = false;
+        private string _currentMode = "Dynamic";
+
+
         public string selectedAlgo;
         private IScheduler _currentScheduler;
         ScheduleResult res;
@@ -30,17 +35,41 @@ namespace CPU_Scheduler
 
             _timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
             _timer.Tick += Timer_Tick;
+
+            QuantumPanel.Visibility = Visibility.Collapsed;
+            PriorityPanel.Visibility = Visibility.Collapsed;
+            PreemptionPanel.Visibility = Visibility.Collapsed;
+
         }
 
         private void AddProcess_Click(object sender, RoutedEventArgs e)
         {
+            if (_hasStarted && _currentMode == "Static")
+            {
+                MessageBox.Show("Cannot add processes while a Static simulation is running.", "Warning");
+                return;
+            }
+
+            if (_isSimulationActive && _currentMode == "Dynamic")
+            {
+                MessageBox.Show("Please Pause the simulation before adding a dynamic process.", "Warning");
+                return;
+            }
+
             if (int.TryParse(InputBurst.Text, out int burst))
             {
                 int.TryParse(InputPriority.Text, out int priority);
 
-                var p = new Process(InputPID.Text, _currentTime, burst, priority);
+                int arrival = _currentTime;
+                if (_currentMode == "Static")
+                {
+                    if (!int.TryParse(InputArrival.Text, out arrival)) arrival = 0;
+                }
+
+                var p = new Process(InputPID.Text, arrival, burst, priority);
                 Processes.Add(p);
-                if (_currentScheduler != null)
+
+                if (_hasStarted && _currentScheduler != null)
                 {
                     _currentScheduler.AddProcess(p);
                 }
@@ -51,36 +80,80 @@ namespace CPU_Scheduler
             }
         }
 
-        private void StartBtn_Click(object sender, RoutedEventArgs e)
+        private void ClearProcess_Click(object sender, RoutedEventArgs e)
         {
-            if (Processes.Count == 0) return;
-
-            _currentTime = 0;
-            _result.Reset();
-            GanttContainer.Children.Clear();
-
-            selectedAlgo = (AlgoSelector.SelectedItem as ComboBoxItem).Content.ToString();
-            int.TryParse(InputQuantum.Text, out int quantum);
-            if (quantum <= 0) quantum = 2;
-
-            _currentScheduler = selectedAlgo switch
+            if (_isSimulationActive && !Finished)
             {
-                "FCFS" => new FCFSScheduler(),
-                "SJF (Preemptive)" => new SJFScheduler(true),
-                "SJF (Non-Preemptive)" => new SJFScheduler(false),
-                "Priority (Preemptive)" => new PriorityScheduler(true),
-                "Priority (Non-Preemptive)" => new PriorityScheduler(false),
-                "Round Robin" => new RoundRobinScheduler(quantum)
-            };
-
-            foreach (var p in Processes)
-            {
-                p.Reset();
-                _currentScheduler.AddProcess(p);
+                MessageBox.Show("Please pause the simulation before clearing processes.", "Warning");
+                return;
             }
 
 
+            ResetBtn_Click(null, null);
+
+
+            Processes.Clear();
+            ProcessGrid.Items.Refresh();
+        }
+
+        private void StartBtn_Click(object sender, RoutedEventArgs e)
+        {
+            Finished = false;
+            if (_currentMode == "Static")
+            {
+                if (_timer != null) _timer.Interval = TimeSpan.FromMilliseconds(0);
+            }
+            else
+            {
+                if (_timer != null) _timer.Interval = TimeSpan.FromSeconds(1);
+            }
+            if (Processes.Count == 0) return;
+
+            if (_isSimulationActive)
+            {
+                _timer.Stop();
+                _isSimulationActive = false;
+                StartBtn.Content = "▶ RESUME";
+                StartBtn.Background = Brushes.Orange;
+                return;
+            }
+
+            if (!_hasStarted)
+            {
+                _currentTime = 0;
+                _result.Reset();
+                GanttContainer.Children.Clear();
+
+                selectedAlgo = (AlgoSelector.SelectedItem as ComboBoxItem).Content.ToString();
+                int.TryParse(InputQuantum.Text, out int quantum);
+                if (quantum <= 0) quantum = 2;
+
+                string preemptionType = (PreemptionSelector.SelectedItem as ComboBoxItem)?.Content?.ToString();
+                bool isPreemptive = preemptionType == "Preemptive";
+
+                _currentScheduler = selectedAlgo switch
+                {
+                    "FCFS" => new FCFSScheduler(),
+                    "SJF" => new SJFScheduler(isPreemptive),
+                    "Priority" => new PriorityScheduler(isPreemptive),
+                    "Round Robin" => new RoundRobinScheduler(quantum),
+                    _ => new FCFSScheduler()
+                };
+
+                foreach (var p in Processes)
+                {
+                    p.Reset();
+                    _currentScheduler.AddProcess(p);
+                }
+
+                _hasStarted = true;
+                ResetBtn.Visibility = Visibility.Visible;
+            }
+
             _timer.Start();
+            _isSimulationActive = true;
+            StartBtn.Content = "⏸ PAUSE";
+            StartBtn.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#EF4444"));
         }
 
         private void Timer_Tick(object sender, EventArgs e)
@@ -108,6 +181,7 @@ namespace CPU_Scheduler
                 if (!_currentScheduler.HasProcesses())
                 {
                     _timer.Stop();
+                    Finished = true;
                     MessageBox.Show("Finished!");
                 }
                 else
@@ -124,54 +198,117 @@ namespace CPU_Scheduler
                 var originalProcess = Processes.FirstOrDefault(p => p.ProcessID == entry.ProcessID);
                 var processBrush = originalProcess?.ProcessColor ?? Brushes.DodgerBlue;
 
+                var grid = new Grid();
+
+                grid.Children.Add(new TextBlock
+                {
+                    Text = entry.ProcessID,
+                    Foreground = Brushes.White,
+                    FontWeight = FontWeights.Bold,
+                    FontSize = 18,
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Center
+                });
+
+                grid.Children.Add(new TextBlock
+                {
+                    Text = entry.StartTime.ToString(),
+                    Foreground = Brushes.White,
+                    FontSize = 10,
+                    Margin = new Thickness(4, 0, 0, 2),
+                    HorizontalAlignment = HorizontalAlignment.Left,
+                    VerticalAlignment = VerticalAlignment.Bottom
+                });
+
+                grid.Children.Add(new TextBlock
+                {
+                    Text = entry.EndTime.ToString(),
+                    Foreground = Brushes.White,
+                    FontSize = 10,
+                    Margin = new Thickness(0, 0, 4, 2),
+                    HorizontalAlignment = HorizontalAlignment.Right,
+                    VerticalAlignment = VerticalAlignment.Bottom
+                });
+
                 var block = new Border
                 {
-                    Width = entry.Duration * 40,
-                    Height = 60,
+                    Width = entry.Duration * 80,
+                    Height = 100,
                     Background = processBrush,
                     BorderBrush = Brushes.White,
                     BorderThickness = new Thickness(2),
                     CornerRadius = new CornerRadius(4),
                     Margin = new Thickness(0, 0, 4, 0),
-                    Child = new TextBlock
-                    {
-                        Text = entry.ProcessID,
-                        Foreground = Brushes.White,
-                        FontWeight = FontWeights.Bold,
-                        FontSize = 18,
-                        HorizontalAlignment = HorizontalAlignment.Center,
-                        VerticalAlignment = VerticalAlignment.Center
-                    }
+                    Child = grid
                 };
                 GanttContainer.Children.Add(block);
             }
 
-            // Update averages and refresh properties for the DataGrid (Wait/Turnaround times)
             AvgWaitText.Text = $"Avg Wait: {_result.AverageWaitingTime:0.0}s";
             AvgTurnText.Text = $"Avg Turnaround: {_result.AverageTurnaroundTime:0.0}s";
             ProcessGrid.Items.Refresh();
         }
 
+        private void ResetBtn_Click(object sender, RoutedEventArgs e)
+        {
+            _timer.Stop();
+            _isSimulationActive = false;
+            _hasStarted = false;
+            _currentTime = 0;
+            TimeLabel.Text = $"Time: 0s";
+            _result.Reset();
+            GanttContainer.Children.Clear();
+            foreach (var p in Processes) p.Reset();
+
+            StartBtn.Content = "▶ RUN ALGORITHM";
+            StartBtn.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#10B981"));
+            ResetBtn.Visibility = Visibility.Collapsed;
+            ProcessGrid.Items.Refresh();
+        }
+
+        private void ModeSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (ArrivalPanel == null) return;
+            var selected = (ModeSelector.SelectedItem as ComboBoxItem)?.Content?.ToString();
+            _currentMode = selected ?? "Dynamic";
+
+            if (_currentMode == "Static")
+                ArrivalPanel.Visibility = Visibility.Visible;
+            else
+                ArrivalPanel.Visibility = Visibility.Collapsed;
+        }
+
+
+
         private void AlgoSelector_SelectionChanged_1(object sender, SelectionChangedEventArgs e)
         {
-            if (AlgoSelector == null || PriorityPanel == null || QuantumPanel == null) return;
-            
+            if (AlgoSelector == null || PriorityPanel == null || QuantumPanel == null || PreemptionPanel == null) return;
+
             var selected = (AlgoSelector.SelectedItem as ComboBoxItem)?.Content?.ToString();
-            
+
             if (selected == "Round Robin")
             {
                 QuantumPanel.Visibility = Visibility.Visible;
                 PriorityPanel.Visibility = Visibility.Collapsed;
+                PreemptionPanel.Visibility = Visibility.Collapsed;
             }
-            else if (selected == "Priority (Preemptive)" || selected == "Priority (Non-Preemptive)")
+            else if (selected == "Priority")
             {
                 QuantumPanel.Visibility = Visibility.Collapsed;
                 PriorityPanel.Visibility = Visibility.Visible;
+                PreemptionPanel.Visibility = Visibility.Visible;
+            }
+            else if (selected == "SJF")
+            {
+                QuantumPanel.Visibility = Visibility.Collapsed;
+                PriorityPanel.Visibility = Visibility.Collapsed;
+                PreemptionPanel.Visibility = Visibility.Visible;
             }
             else
             {
                 QuantumPanel.Visibility = Visibility.Collapsed;
                 PriorityPanel.Visibility = Visibility.Collapsed;
+                PreemptionPanel.Visibility = Visibility.Collapsed;
             }
         }
     }
