@@ -37,7 +37,7 @@
             </Style.Triggers>
         </Style>
 
-        <!-- Modern Green Go/Run Button Style -->
+
         <Style x:Key="ModernButtonGreen" TargetType="Button" BasedOn="{StaticResource ModernButton}">
             <Setter Property="Background" Value="#10B981"/>
             <Style.Triggers>
@@ -50,7 +50,7 @@
             </Style.Triggers>
         </Style>
 
-        <!-- Smooth Input TextBox Style -->
+
         <Style TargetType="TextBox">
             <Setter Property="Padding" Value="10,8"/>
             <Setter Property="BorderBrush" Value="#CBD5E1"/>
@@ -78,7 +78,7 @@
             </Style.Triggers>
         </Style>
 
-        <!-- Smooth Combo Box Style Approximation -->
+
         <Style TargetType="ComboBox">
             <Setter Property="Padding" Value="10,8"/>
             <Setter Property="BorderBrush" Value="#CBD5E1"/>
@@ -88,7 +88,7 @@
             <Setter Property="FontSize" Value="14"/>
         </Style>
 
-        <!-- Input Label Style -->
+
         <Style TargetType="TextBlock" x:Key="InputLabel">
             <Setter Property="FontSize" Value="12"/>
             <Setter Property="Foreground" Value="#64748B"/>
@@ -106,12 +106,12 @@
             <RowDefinition Height="160"/>
         </Grid.RowDefinitions>
 
-        <!-- Header -->
+
         <StackPanel Grid.Row="0" Margin="0,0,0,25">
             <TextBlock Text="CPU Scheduler" FontSize="32" FontWeight="Bold" Foreground="#0F172A"/>
         </StackPanel>
 
-        <!-- Controls Panel -->
+
         <Border Grid.Row="1" Background="White" CornerRadius="16" Padding="25" Margin="0,0,0,25">
             <Border.Effect>
                 <DropShadowEffect BlurRadius="20" ShadowDepth="4" Opacity="0.04" Color="Black" Direction="270"/>
@@ -196,7 +196,7 @@
             </Grid>
         </Border>
 
-        <!-- Process DataGrid Container -->
+
         <Border Grid.Row="2" Background="White" CornerRadius="16" Margin="0,0,0,25" Padding="15">
             <Border.Effect>
                 <DropShadowEffect BlurRadius="20" ShadowDepth="4" Opacity="0.04" Color="Black" Direction="270"/>
@@ -254,7 +254,7 @@
             </DataGrid>
         </Border>
 
-        <!-- Visual Timeline Header & Averages -->
+
         <Grid Grid.Row="3" Margin="5,0,0,12">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
@@ -277,12 +277,12 @@
             </Border>
         </Grid>
 
-        <!-- Visual Timeline Container -->
+
         <Border Grid.Row="4" Background="#0F172A" CornerRadius="16" ClipToBounds="True">
             <Border.Effect>
                 <DropShadowEffect BlurRadius="25" ShadowDepth="10" Opacity="0.15" Color="Black" Direction="270"/>
             </Border.Effect>
-            <!-- A subtle inner glow could be achieved with another border, but keeping simple here -->
+
             <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled" Padding="20">
                 <StackPanel x:Name="GanttContainer" Orientation="Horizontal" VerticalAlignment="Center"/>
             </ScrollViewer>

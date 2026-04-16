@@ -22,7 +22,7 @@ namespace CPU_Scheduler
         private bool Finished = false;
         private string _currentMode = "Dynamic";
 
-        // This would be initialized based on your ComboBox selection
+
         public string selectedAlgo;
         private IScheduler _currentScheduler;
         ScheduleResult res;
@@ -88,10 +88,10 @@ namespace CPU_Scheduler
                 return;
             }
 
-            // Halt simulation entirely
+
             ResetBtn_Click(null, null);
 
-            // Nuke the source data
+
             Processes.Clear();
             ProcessGrid.Items.Refresh();
         }
