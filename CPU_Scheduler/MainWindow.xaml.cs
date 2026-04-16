@@ -18,6 +18,8 @@ namespace CPU_Scheduler
         private int _currentTime = 0;
         private bool _isSimulationActive = false;
         private bool _hasStarted = false;
+
+        private bool Finished = false;
         private string _currentMode = "Dynamic";
 
         // This would be initialized based on your ComboBox selection
@@ -80,7 +82,7 @@ namespace CPU_Scheduler
 
         private void ClearProcess_Click(object sender, RoutedEventArgs e)
         {
-            if (_isSimulationActive)
+            if (_isSimulationActive && !Finished)
             {
                 MessageBox.Show("Please pause the simulation before clearing processes.", "Warning");
                 return;
@@ -96,6 +98,7 @@ namespace CPU_Scheduler
 
         private void StartBtn_Click(object sender, RoutedEventArgs e)
         {
+            Finished = false;
             if (_currentMode == "Static")
             {
                 if (_timer != null) _timer.Interval = TimeSpan.FromMilliseconds(0);
@@ -178,6 +181,7 @@ namespace CPU_Scheduler
                 if (!_currentScheduler.HasProcesses())
                 {
                     _timer.Stop();
+                    Finished = true;
                     MessageBox.Show("Finished!");
                 }
                 else
