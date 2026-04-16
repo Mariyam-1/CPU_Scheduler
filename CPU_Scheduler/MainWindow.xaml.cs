@@ -233,7 +233,7 @@ namespace CPU_Scheduler
                 var block = new Border
                 {
                     Width = entry.Duration * 80,
-                    Height = 120,
+                    Height = 100,
                     Background = processBrush,
                     BorderBrush = Brushes.White,
                     BorderThickness = new Thickness(2),
