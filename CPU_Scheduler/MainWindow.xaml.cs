@@ -187,6 +187,8 @@ namespace CPU_Scheduler
                 else
                 {
                     _currentTime++;
+                    TimeLabel.Text = $"Time: {_currentTime}s";
+
                 }
             }
         }
